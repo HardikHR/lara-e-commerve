@@ -1,0 +1,30 @@
+Product Catalog API:
+/products: Retrieve product list
+/products/{productId}: Get details of a specific product
+/products/search: Search products by keywords
+/products/categories: Get product categories
+
+Customer API:
+/customers: Create new customer
+/customers/{customerId}: Get customer details profile
+/customers/login: Customer login
+/customers/addresses: Manage customer addresses
+
+Order API:
+/orders: Create new order
+/orders/{orderId}: Get order details
+/orders/status: Update order status
+
+Cart API:
+/cart: Add item to cart
+/cart/items: Get items in cart
+/cart/update: Update quantity of an item in cart
+/cart/delete: Remove item from cart
+
+Inventory API:
+/inventory: Get current inventory levels
+/inventory/update: Update inventory for a product
+
+Payment API:
+/payments/process: Initiate payment processing
+/payments/status: Check payment status
