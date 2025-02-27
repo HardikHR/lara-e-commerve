@@ -28,3 +28,15 @@ Inventory API:
 Payment API:
 /payments/process: Initiate payment processing
 /payments/status: Check payment status
+
+
+authentication,
+crud,
+template integration,
+mail,
+queue,
+oop,
+mysql-query,
+joins,
+function,
+php and array functions, github
