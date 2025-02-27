@@ -2,60 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Razorpay\Api\Api;
 use App\Models\Order;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
 
 class PaymentController extends Controller
 {
-    public function createOrder(Request $request)
+    public function createOrder(Request $request, Order $Order)
     {
-        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-
-        $orderData = [
-            'receipt' => 'order_' . time(),
-            'amount' => $request->amount * 100, // Convert to paisa
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+        $paymentIntent = PaymentIntent::create([
+            'amount' => $request->amount * 100,
             'currency' => 'INR',
-            'payment_capture' => 1 // Auto capture
-        ];
-
-        $order = $api->order->create($orderData);
-
-        return response()->json([
-            'order_id' => $order['id'],
-            'razorpay_key' => env('RAZORPAY_KEY'),
-            'amount' => $orderData['amount'],
-            'currency' => 'INR'
         ]);
+
+        $Order->amount = $request->amount;
+        $Order->payment_id = $paymentIntent->id;
+        $Order->user_id = Auth::id();
+        $Order->order_id = $paymentIntent->client_secret;
+        $Order->save();
+
+        return response()->json(['data' => $Order]);
     }
 
     public function verifyPayment(Request $request)
     {
-        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-
-        $attributes = [
-            'razorpay_order_id' => $request->razorpay_order_id,
-            'razorpay_payment_id' => $request->razorpay_payment_id,
-            'razorpay_signature' => $request->razorpay_signature
-        ];
-
-        try {
-            $api->utility->verifyPaymentSignature($attributes);
-            
-            // Save payment details to DB
-            Order::create([
-                'user_id' => auth()->id(),
-                'order_id' => $request->razorpay_order_id,
-                'payment_id' => $request->razorpay_payment_id,
-                'amount' => $request->amount,
-                'status' => 'Paid'
-            ]);
-
-            return response()->json(['message' => 'Payment successful']);
-        } catch (\Exception $e) {
-            Log::error('Payment verification failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Payment verification failed'], 400);
+        $paymentId = $request->payment_id;
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+        $payment = \Stripe\PaymentIntent::retrieve($paymentId);
+        if ($payment->status == 'succeeded') {
+            return response()->json(['message' => 'Payment Successful']);
+        } else {
+            return response()->json(['message' => 'Payment Failed']);
         }
     }
 }
