@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetails;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\CheckProductOwner;
 
 Route::post('register', [UserDetails::class, 'store']);
@@ -21,4 +22,8 @@ Route::middleware('auth:api')->group( function () {
     Route::put('/cart/update/{id}', [CartController::class, 'updateCartItem']);
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeCartItem']);
     Route::delete('/cart/clear', [CartController::class, 'clearCart']);
+
+    //orders
+    Route::post('/payment/order', [PaymentController::class, 'createOrder']);
+    Route::post('/payment/verify', [PaymentController::class, 'verifyPayment']);
 });

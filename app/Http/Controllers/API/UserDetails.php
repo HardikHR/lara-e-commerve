@@ -39,6 +39,7 @@ class UserDetails extends ControllersBaseController
         $user = User::create($input);
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;
+        $success['email'] = $user->email;
         $success['client_id'] = $client->id;
         $success['client_secret'] = $client->secret;
 
