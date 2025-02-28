@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\UserDetails;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Middleware\CheckProductOwner;
 
 Route::post('register', [UserDetails::class, 'store']);
@@ -26,4 +27,6 @@ Route::middleware('auth:api')->group( function () {
     //orders
     Route::post('/payment/order', [PaymentController::class, 'createOrder']);
     Route::post('/payment/verify', [PaymentController::class, 'verifyPayment']);
+
+    Route::resource('permission', PermissionController::class);
 });
